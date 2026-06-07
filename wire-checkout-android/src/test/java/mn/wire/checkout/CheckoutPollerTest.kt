@@ -42,7 +42,7 @@ class CheckoutPollerTest {
             )
         )
         // Drive the injected clock off the test scheduler's virtual time.
-        val clock = MonotonicClock { currentTime * 1_000_000L }
+        val clock = MonotonicClock { testScheduler.currentTime * 1_000_000L }
         val poller = CheckoutPoller(http, WireCheckoutConfig(pollIntervalMillis = 2_000L), clock)
 
         val result = poller.await(endpoint)
@@ -55,7 +55,7 @@ class CheckoutPollerTest {
     @Test
     fun immediateCanceled_resolvesCanceled() = runTest {
         val http = ScriptedHttp(listOf(status("canceled")))
-        val clock = MonotonicClock { currentTime * 1_000_000L }
+        val clock = MonotonicClock { testScheduler.currentTime * 1_000_000L }
         val poller = CheckoutPoller(http, WireCheckoutConfig(), clock)
         assertTrue(poller.await(endpoint) is WireCheckoutResult.Canceled)
     }
@@ -63,7 +63,7 @@ class CheckoutPollerTest {
     @Test
     fun failed_resolvesFailed() = runTest {
         val http = ScriptedHttp(listOf(status("failed")))
-        val clock = MonotonicClock { currentTime * 1_000_000L }
+        val clock = MonotonicClock { testScheduler.currentTime * 1_000_000L }
         val poller = CheckoutPoller(http, WireCheckoutConfig(), clock)
         assertTrue(poller.await(endpoint) is WireCheckoutResult.Failed)
     }
@@ -71,7 +71,7 @@ class CheckoutPollerTest {
     @Test
     fun neverTerminal_timesOut() = runTest {
         val http = ScriptedHttp(listOf(status("requires_payment")))
-        val clock = MonotonicClock { currentTime * 1_000_000L }
+        val clock = MonotonicClock { testScheduler.currentTime * 1_000_000L }
         val poller = CheckoutPoller(
             http,
             WireCheckoutConfig(pollIntervalMillis = 2_000L, timeoutMillis = 10_000L),
@@ -88,7 +88,7 @@ class CheckoutPollerTest {
                 status("succeeded"),
             )
         )
-        val clock = MonotonicClock { currentTime * 1_000_000L }
+        val clock = MonotonicClock { testScheduler.currentTime * 1_000_000L }
         val poller = CheckoutPoller(http, WireCheckoutConfig(pollIntervalMillis = 2_000L), clock)
         assertTrue(poller.await(endpoint) is WireCheckoutResult.Completed)
         assertEquals(2, http.calls)
@@ -97,7 +97,7 @@ class CheckoutPollerTest {
     @Test
     fun httpStatusError_propagates() = runTest {
         val http = ScriptedHttp(listOf(WireCheckoutException.HttpStatus(500)))
-        val clock = MonotonicClock { currentTime * 1_000_000L }
+        val clock = MonotonicClock { testScheduler.currentTime * 1_000_000L }
         val poller = CheckoutPoller(http, WireCheckoutConfig(), clock)
         assertFailsWith<WireCheckoutException.HttpStatus> { poller.await(endpoint) }
     }
@@ -105,7 +105,7 @@ class CheckoutPollerTest {
     @Test
     fun cancellation_stopsPolling() = runTest {
         val http = ScriptedHttp(listOf(status("requires_payment")))
-        val clock = MonotonicClock { currentTime * 1_000_000L }
+        val clock = MonotonicClock { testScheduler.currentTime * 1_000_000L }
         val poller = CheckoutPoller(http, WireCheckoutConfig(pollIntervalMillis = 2_000L), clock)
 
         val job = launch { poller.await(endpoint) }
