@@ -26,13 +26,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    // Expose a single published variant + sources/javadoc for Maven Central.
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-            withJavadocJar()
-        }
-    }
+    // The published "release" variant + sources/javadoc jars are configured by
+    // the vanniktech plugin's AndroidSingleVariantLibrary below; declaring an
+    // AGP `publishing { singleVariant("release") }` here as well makes Gradle
+    // fail with "Using singleVariant publishing DSL multiple times".
 
     testOptions {
         unitTests.isReturnDefaultValues = true
