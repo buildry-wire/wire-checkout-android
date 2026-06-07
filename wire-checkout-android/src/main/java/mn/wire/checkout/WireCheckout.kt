@@ -55,9 +55,12 @@ public class WireCheckout @JvmOverloads constructor(
 
     /**
      * Present a checkout identified by [token] against [baseUrl] (or [WireCheckoutConfig.baseUrl]).
+     *
+     * Named distinctly from [launch] because, with `@JvmOverloads`, a second `launch(String, ...)`
+     * overload would generate a JVM signature that clashes with [launch].
      */
     @JvmOverloads
-    public fun launch(
+    public fun launchWithToken(
         token: String,
         baseUrl: String? = null,
         redirectScheme: String? = null,
