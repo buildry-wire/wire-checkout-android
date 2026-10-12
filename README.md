@@ -86,8 +86,7 @@ final outcome. Always treat the status API result â€” not the deeplink itself â€
 - The merchant creates the session **server-side**; this SDK is client-side and never sees a
   secret key.
 - The status endpoint is unauthenticated and the SDK attaches no credentials.
-- Operators shown in checkout are the operators enabled on your account. In sandbox, examples use
-  `["sandbox"]`.
+- Operators shown in checkout are the operators enabled on your project.
 
 ## License
 
